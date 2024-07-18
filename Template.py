@@ -3,24 +3,22 @@ import requests
 
 api_key = "1df68b90-936c-441d-89a9-997c23f61dfa"
 
+st.set_page_config(page_title="Weather and Air Quality Web App", page_icon="☁️")
+
 st.title("Weather and Air Quality Web App")
 st.header("Streamlit and AirVisual API")
 
+def celsius_to_fahrenheit(celsius):
+    return (celsius * 9/5) + 32
 
 @st.cache_data
 def map_creator(latitude, longitude):
     from streamlit_folium import folium_static
     import folium
 
-    # center on the station
     m = folium.Map(location=[latitude, longitude], zoom_start=10)
-
-    # add marker for the station
-    folium.Marker([latitude, longitude], popup="Station", tooltip="Station").add_to(m)
-
-    # call to render Folium map in Streamlit
+    folium.Marker([latitude, longitude], popup="Location", tooltip="Location").add_to(m)
     folium_static(m)
-
 
 @st.cache_data
 def generate_list_of_countries():
@@ -28,13 +26,11 @@ def generate_list_of_countries():
     countries_dict = requests.get(countries_url).json()
     return countries_dict
 
-
 @st.cache_data
 def generate_list_of_states(country_selected):
     states_url = f"https://api.airvisual.com/v2/states?country={country_selected}&key={api_key}"
     states_dict = requests.get(states_url).json()
     return states_dict
-
 
 @st.cache_data
 def generate_list_of_cities(state_selected, country_selected):
@@ -42,10 +38,8 @@ def generate_list_of_cities(state_selected, country_selected):
     cities_dict = requests.get(cities_url).json()
     return cities_dict
 
-
-# Include a select box for the options: ["By City, State, and Country", "By Nearest City (IP Address)", "By Latitude and Longitude"]
-# and save its selected option in a variable called category
-category = st.selectbox(
+# Sidebar for location selection method
+category = st.sidebar.selectbox(
     "Select the method to find air quality information:",
     ["By City, State, and Country", "By Nearest City (IP Address)", "By Latitude and Longitude"]
 )
@@ -58,7 +52,6 @@ if category == "By City, State, and Country":
 
         country_selected = st.selectbox("Select a country", options=countries_list)
         if country_selected:
-            # Generate the list of states, and add a select box for the user to choose the state
             states_dict = generate_list_of_states(country_selected)
             if states_dict["status"] == "success":
                 states_list = [i["state"] for i in states_dict["data"]]
@@ -66,35 +59,53 @@ if category == "By City, State, and Country":
 
                 state_selected = st.selectbox("Select a state:", options=states_list)
                 if state_selected:
-                    # Generate the list of cities, and add a select box for the user to choose the city
                     cities_dict = generate_list_of_cities(state_selected, country_selected)
                     if cities_dict["status"] == "success":
                         cities_list = [i["city"] for i in cities_dict["data"]]
                         cities_list.insert(0, "")
 
                         city_selected = st.selectbox("Select a city:", options=cities_list)
-
                         if city_selected:
                             aqi_data_url = f"https://api.airvisual.com/v2/city?city={city_selected}&state={state_selected}&country={country_selected}&key={api_key}"
                             aqi_data_dict = requests.get(aqi_data_url).json()
 
                             if aqi_data_dict["status"] == "success":
-                                # Display the weather and air quality data as shown in the video and description of the assignment
                                 data = aqi_data_dict["data"]
                                 location = data["city"]
                                 weather = data["current"]["weather"]
                                 pollution = data["current"]["pollution"]
+                                latitude = data["location"]["coordinates"][1]
+                                longitude = data["location"]["coordinates"][0]
+
+                                temp_celsius = weather['tp']
+                                temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
+
+                                st.write(f"### Air Quality and Weather Data for {location}")
 
                                 with st.container():
-                                    st.write("#### Weather")
-                                    st.write(f"**Temperature:** {weather['tp']}°C")
-                                    st.write(f"**Humidity:** {weather['hu']}%")
-                                    st.write(f"**Wind Speed:** {weather['ws']} m/s")
+                                    st.markdown(
+                                        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px;'>"
+                                        f"#### Weather<br>"
+                                        f"**Temperature:** {temp_celsius}°C / {temp_fahrenheit}°F<br>"
+                                        f"**Humidity:** {weather['hu']}%<br>"
+                                        f"**Wind Speed:** {weather['ws']} m/s<br>"
+                                        f"</div>",
+                                        unsafe_allow_html=True
+                                    )
 
                                 with st.container():
-                                    st.write("#### Air Quality")
-                                    st.write(f"**AQI US:** {pollution['aqius']}")
-                                    st.write(f"**Main Pollutant:** {pollution['mainus']}")
+                                    st.markdown(
+                                        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px;'>"
+                                        f"#### Air Quality<br>"
+                                        f"**AQI US:** {pollution['aqius']}<br>"
+                                        f"**Main Pollutant:** {pollution['mainus']}<br>"
+                                        f"</div>",
+                                        unsafe_allow_html=True
+                                    )
+
+                                st.write(f"### Map for {location}")
+                                map_creator(latitude, longitude)
+
                             else:
                                 st.warning("No data available for this location.")
                         else:
@@ -111,26 +122,46 @@ elif category == "By Nearest City (IP Address)":
     aqi_data_dict = requests.get(url).json()
 
     if aqi_data_dict["status"] == "success":
-        # Display the weather and air quality data as shown in the video and description of the assignment
         data = aqi_data_dict["data"]
         location = data["city"]
         weather = data["current"]["weather"]
         pollution = data["current"]["pollution"]
+        latitude = data["location"]["coordinates"][1]
+        longitude = data["location"]["coordinates"][0]
+
+        temp_celsius = weather['tp']
+        temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
+
+        st.write(f"### Air Quality and Weather Data for {location}")
 
         with st.container():
-            st.write("#### Weather")
-            st.write(f"**Temperature:** {weather['tp']}°C")
-            st.write(f"**Humidity:** {weather['hu']}%")
-            st.write(f"**Wind Speed:** {weather['ws']} m/s")
+            st.markdown(
+                f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px;'>"
+                f"#### Weather<br>"
+                f"**Temperature:** {temp_celsius}°C / {temp_fahrenheit}°F<br>"
+                f"**Humidity:** {weather['hu']}%<br>"
+                f"**Wind Speed:** {weather['ws']} m/s<br>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
         with st.container():
-            st.write("#### Air Quality")
-            st.write(f"**AQI US:** {pollution['aqius']}")
-            st.write(f"**Main Pollutant:** {pollution['mainus']}")
+            st.markdown(
+                f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px;'>"
+                f"#### Air Quality<br>"
+                f"**AQI US:** {pollution['aqius']}<br>"
+                f"**Main Pollutant:** {pollution['mainus']}<br>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
+        st.write(f"### Map for {location}")
+        map_creator(latitude, longitude)
+
     else:
         st.warning("No data available for this location.")
 
 elif category == "By Latitude and Longitude":
-    # Add two text input boxes for the user to enter the latitude and longitude information
     latitude = st.text_input("Enter latitude:")
     longitude = st.text_input("Enter longitude:")
     if latitude and longitude:
@@ -138,20 +169,39 @@ elif category == "By Latitude and Longitude":
         aqi_data_dict = requests.get(url).json()
 
         if aqi_data_dict["status"] == "success":
-            # Display the weather and air quality data as shown in the video and description of the assignment
             data = aqi_data_dict["data"]
             location = data["city"]
             weather = data["current"]["weather"]
             pollution = data["current"]["pollution"]
 
+            temp_celsius = weather['tp']
+            temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
+
+            st.write(f"### Air Quality and Weather Data for {location}")
+
             with st.container():
-                st.write("#### Weather")
-                st.write(f"**Temperature:** {weather['tp']}°C")
-                st.write(f"**Humidity:** {weather['hu']}%")
-                st.write(f"**Wind Speed:** {weather['ws']} m/s")
+                st.markdown(
+                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px;'>"
+                    f"#### Weather<br>"
+                    f"**Temperature:** {temp_celsius}°C / {temp_fahrenheit}°F<br>"
+                    f"**Humidity:** {weather['hu']}%<br>"
+                    f"**Wind Speed:** {weather['ws']} m/s<br>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+
             with st.container():
-                st.write("#### Air Quality")
-                st.write(f"**AQI US:** {pollution['aqius']}")
-                st.write(f"**Main Pollutant:** {pollution['mainus']}")
+                st.markdown(
+                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px;'>"
+                    f"#### Air Quality<br>"
+                    f"**AQI US:** {pollution['aqius']}<br>"
+                    f"**Main Pollutant:** {pollution['mainus']}<br>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+
+            st.write(f"### Map for {location}")
+            map_creator(latitude, longitude)
+
         else:
             st.warning("No data available for this location.")
