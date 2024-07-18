@@ -33,9 +33,6 @@ def display_weather_and_air_quality(data):
     weather = data["current"]["weather"]
     pollution = data["current"]["pollution"]
 
-    # Display the map with debug pop-up
-    st.write("### Map for {}".format(location))
-    st.write(f"**Debug:** Coordinates for the map are Latitude: {latitude}, Longitude: {longitude}")
 
     # Create the Pydeck map
     df = pd.DataFrame([[latitude, longitude]], columns=['latitude', 'longitude'])
