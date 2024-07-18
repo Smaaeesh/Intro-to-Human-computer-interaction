@@ -85,12 +85,14 @@ if category == "By City, State, and Country":
                                 weather = data["current"]["weather"]
                                 pollution = data["current"]["pollution"]
 
-                                st.write(f"### Air Quality and Weather Data for {location}")
-                                st.write(f"**Temperature:** {weather['tp']}°C")
-                                st.write(f"**Humidity:** {weather['hu']}%")
-                                st.write(f"**Wind Speed:** {weather['ws']} m/s")
-                                st.write(f"**AQI US:** {pollution['aqius']}")
-                                st.write(f"**Main Pollutant:** {pollution['mainus']}")
+                                with st.beta_expander("Weather Information"):
+                                    st.write(f"**Temperature:** {weather['tp']}°C")
+                                    st.write(f"**Humidity:** {weather['hu']}%")
+                                    st.write(f"**Wind Speed:** {weather['ws']} m/s")
+
+                                with st.beta_expander("Air Quality Information"):
+                                    st.write(f"**AQI US:** {pollution['aqius']}")
+                                    st.write(f"**Main Pollutant:** {pollution['mainus']}")
                             else:
                                 st.warning("No data available for this location.")
                         else:
@@ -113,12 +115,14 @@ elif category == "By Nearest City (IP Address)":
         weather = data["current"]["weather"]
         pollution = data["current"]["pollution"]
 
-        st.write(f"### Air Quality and Weather Data for {location}")
-        st.write(f"**Temperature:** {weather['tp']}°C")
-        st.write(f"**Humidity:** {weather['hu']}%")
-        st.write(f"**Wind Speed:** {weather['ws']} m/s")
-        st.write(f"**AQI US:** {pollution['aqius']}")
-        st.write(f"**Main Pollutant:** {pollution['mainus']}")
+        with st.beta_expander("Weather Information"):
+            st.write(f"**Temperature:** {weather['tp']}°C")
+            st.write(f"**Humidity:** {weather['hu']}%")
+            st.write(f"**Wind Speed:** {weather['ws']} m/s")
+
+        with st.beta_expander("Air Quality Information"):
+            st.write(f"**AQI US:** {pollution['aqius']}")
+            st.write(f"**Main Pollutant:** {pollution['mainus']}")
     else:
         st.warning("No data available for this location.")
 
