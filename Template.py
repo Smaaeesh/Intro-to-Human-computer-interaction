@@ -21,7 +21,7 @@ def generate_list_of_countries():
     countries_url = f"https://api.airvisual.com/v2/countries?key={api_key}"
     response = requests.get(countries_url)
     countries_dict = response.json()
-    st.write("Countries API Response:", countries_dict)  # Debugging statement
+
     return countries_dict
 
 # Cached function to generate the list of states based on the selected country
@@ -30,7 +30,7 @@ def generate_list_of_states(country_selected):
     states_url = f"https://api.airvisual.com/v2/states?country={country_selected}&key={api_key}"
     response = requests.get(states_url)
     states_dict = response.json()
-    st.write("States API Response:", states_dict)  # Debugging statement
+
     return states_dict
 
 # Cached function to generate the list of cities based on the selected state and country
@@ -39,7 +39,7 @@ def generate_list_of_cities(state_selected, country_selected):
     cities_url = f"https://api.airvisual.com/v2/cities?state={state_selected}&country={country_selected}&key={api_key}"
     response = requests.get(cities_url)
     cities_dict = response.json()
-    st.write("Cities API Response:", cities_dict)  # Debugging statement
+
     return cities_dict
 
 # Sidebar for location selection method
@@ -155,7 +155,7 @@ if category == "By City, State, and Country":
                             response = requests.get(aqi_data_url)
                             aqi_data_dict = response.json()
 
-                            st.write("AQI Data Response:", aqi_data_dict)  # Debugging statement
+
 
                             if aqi_data_dict["status"] == "success":
                                 display_weather_and_air_quality(aqi_data_dict["data"])
@@ -176,7 +176,7 @@ elif category == "By Nearest City (IP Address)":
     response = requests.get(url)
     aqi_data_dict = response.json()
 
-    st.write("Nearest City API Response:", aqi_data_dict)  # Debugging statement
+
 
     if aqi_data_dict["status"] == "success":
         display_weather_and_air_quality(aqi_data_dict["data"])
@@ -191,8 +191,6 @@ elif category == "By Latitude and Longitude":
         url = f"https://api.airvisual.com/v2/nearest_city?lat={latitude}&lon={longitude}&key={api_key}"
         response = requests.get(url)
         aqi_data_dict = response.json()
-
-        st.write("Latitude and Longitude API Response:", aqi_data_dict)  # Debugging statement
 
         if aqi_data_dict["status"] == "success":
             display_weather_and_air_quality(aqi_data_dict["data"])
