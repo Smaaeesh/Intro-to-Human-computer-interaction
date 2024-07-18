@@ -1,5 +1,7 @@
 import streamlit as st
 import requests
+from streamlit_folium import st_folium
+import folium
 
 api_key = "1df68b90-936c-441d-89a9-997c23f61dfa"
 
@@ -10,15 +12,6 @@ st.header("Streamlit and AirVisual API")
 
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
-
-@st.cache_data
-def map_creator(latitude, longitude):
-    from streamlit_folium import folium_static
-    import folium
-
-    m = folium.Map(location=[latitude, longitude], zoom_start=10)
-    folium.Marker([latitude, longitude], popup="Location", tooltip="Location").add_to(m)
-    folium_static(m)
 
 @st.cache_data
 def generate_list_of_countries():
@@ -88,7 +81,11 @@ def display_weather_and_air_quality(data):
     )
 
     st.write(f"### Map for {location}")
-    map_creator(latitude, longitude)
+    
+    # Create and display the map using st_folium
+    m = folium.Map(location=[latitude, longitude], zoom_start=10)
+    folium.Marker([latitude, longitude], popup="Location", tooltip="Location").add_to(m)
+    st_folium(m, width=700, height=500)
 
 if category == "By City, State, and Country":
     countries_dict = generate_list_of_countries()
