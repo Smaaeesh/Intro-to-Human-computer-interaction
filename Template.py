@@ -85,12 +85,14 @@ if category == "By City, State, and Country":
                                 weather = data["current"]["weather"]
                                 pollution = data["current"]["pollution"]
 
-                                with st.beta_expander("Weather Information"):
+                                with st.container():
+                                    st.write("#### Weather")
                                     st.write(f"**Temperature:** {weather['tp']}°C")
                                     st.write(f"**Humidity:** {weather['hu']}%")
                                     st.write(f"**Wind Speed:** {weather['ws']} m/s")
 
-                                with st.beta_expander("Air Quality Information"):
+                                with st.container():
+                                    st.write("#### Air Quality")
                                     st.write(f"**AQI US:** {pollution['aqius']}")
                                     st.write(f"**Main Pollutant:** {pollution['mainus']}")
                             else:
