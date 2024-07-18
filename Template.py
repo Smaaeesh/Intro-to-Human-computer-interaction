@@ -93,8 +93,8 @@ if category == "By City, State, and Country":
                             st.write(f"**Wind Speed:** {weather['ws']} m/s")
                             st.write(f"**AQI US:** {pollution['aqius']}")
                             st.write(f"**Main Pollutant:** {pollution['mainus']}")
-                            else:
-                                st.warning("No data available for this location.")
+                        else:
+                            st.warning("No data available for this location.")
 
                     else:
                         st.warning("No stations available, please select another state.")
