@@ -100,19 +100,40 @@ elif category == "By Nearest City (IP Address)":
 
     if aqi_data_dict["status"] == "success":
     # TODO: Display the weather and air quality data as shown in the video and description of the assignment
+        data = aqi_data_dict["data"]
+        location = data["city"]
+        weather = data["current"]["weather"]
+        pollution = data["current"]["pollution"]
 
+        st.write(f"### Air Quality and Weather Data for {location}")
+        st.write(f"**Temperature:** {weather['tp']}°C")
+        st.write(f"**Humidity:** {weather['hu']}%")
+        st.write(f"**Wind Speed:** {weather['ws']} m/s")
+        st.write(f"**AQI US:** {pollution['aqius']}")
+        st.write(f"**Main Pollutant:** {pollution['mainus']}")
     else:
         st.warning("No data available for this location.")
 
 elif category == "By Latitude and Longitude":
-    # TODO: Add two text input boxes for the user to enter the latitude and longitude information
-    
+    #Add two text input boxes for the user to enter the latitude and longitude information
+    latitude = st.text_input("Enter latitude:")
+    longitude = st.text_input("Enter longitude:")
     if latitude and longitude:
         url = f"https://api.airvisual.com/v2/nearest_city?lat={latitude}&lon={longitude}&key={api_key}"
         aqi_data_dict = requests.get(url).json()
 
         if aqi_data_dict["status"] == "success":
-        # TODO: Display the weather and air quality data as shown in the video and description of the assignment
+        # Display the weather and air quality data as shown in the video and description of the assignment
+            data = aqi_data_dict["data"]
+            location = data["city"]
+            weather = data["current"]["weather"]
+            pollution = data["current"]["pollution"]
 
+            st.write(f"### Air Quality and Weather Data for {location}")
+            st.write(f"**Temperature:** {weather['tp']}°C")
+            st.write(f"**Humidity:** {weather['hu']}%")
+            st.write(f"**Wind Speed:** {weather['ws']} m/s")
+            st.write(f"**AQI US:** {pollution['aqius']}")
+            st.write(f"**Main Pollutant:** {pollution['mainus']}")
         else:
             st.warning("No data available for this location.")
