@@ -69,14 +69,13 @@ if category == "By City, State, and Country":
 
                 state_selected = st.selectbox("Select a state:", options=states_list)
             if state_selected:
-
-                    # : Generate the list of cities, and add a select box for the user to choose the city
-                    cities_dict = generate_list_of_cities(state_selected)
-                    if cities_dict["status"] == "success":
-                        cities_list = [i["state"] for i in cities_dict["data"]]
-                        cities_list.insert(0, "")
-
-                state_selected = st.selectbox("Select a state:", options=states_list)
+                
+                 # : Generate the list of cities, and add a select box for the user to choose the city
+                cities_dict = generate_list_of_cities(state_selected)
+                if cities_dict["status"] == "success":
+                    cities_list = [i["state"] for i in cities_dict["data"]]
+                    cities_list.insert(0, "")
+                city_selected = st.selectbox("Select a city:", options=cities_list)
                     if city_selected:
                             aqi_data_url = f"https://api.airvisual.com/v2/city?city={city_selected}&state={state_selected}&country={country_selected}&key={api_key}"
                             aqi_data_dict = requests.get(aqi_data_url).json()
