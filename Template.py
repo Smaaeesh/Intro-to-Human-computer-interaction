@@ -62,9 +62,12 @@ if category == "By City, State, and Country":
                                         countries_list)
         if country_selected:
             # : Generate the list of states, and add a select box for the user to choose the state
-            states_list = [i["state"] for i in states_dict["data"]]
-            states_list.insert(0, "")
-            state_selected = st.selectbox("Select a state:", options=states_list)
+            states_dict = generate_list_of_states(country_selected)
+            if states_dict["status"] == "success":
+                states_list = [i["state"] for i in states_dict["data"]]
+                states_list.insert(0, "")
+
+                state_selected = st.selectbox("Select a state:", options=states_list)
             if state_selected:
 
                     # : Generate the list of cities, and add a select box for the user to choose the city
