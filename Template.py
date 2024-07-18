@@ -137,13 +137,12 @@ elif category == "By Latitude and Longitude":
             weather = data["current"]["weather"]
             pollution = data["current"]["pollution"]
 
-            with st.container():
-                st.write("#### Weather")
+            with st.beta_expander("Weather Information"):
                 st.write(f"**Temperature:** {weather['tp']}°C")
                 st.write(f"**Humidity:** {weather['hu']}%")
                 st.write(f"**Wind Speed:** {weather['ws']} m/s")
-            with st.container():
-                st.write("#### Air Quality")
+
+            with st.beta_expander("Air Quality Information"):
                 st.write(f"**AQI US:** {pollution['aqius']}")
                 st.write(f"**Main Pollutant:** {pollution['mainus']}")
         else:
