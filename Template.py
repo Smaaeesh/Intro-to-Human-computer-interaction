@@ -63,31 +63,31 @@ def display_weather_and_air_quality(data):
     st.write(f"### Air Quality and Weather Data for {location}")
     st.markdown(
         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"**Temperature:** {temp_celsius}°C / {temp_fahrenheit}°F"
+        f"Temperature: {temp_celsius}°C / {temp_fahrenheit}°F"
         f"</div>",
         unsafe_allow_html=True
     )
     st.markdown(
         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"**Humidity:** {weather['hu']}%"
+        f"Humidity: {weather['hu']}%"
         f"</div>",
         unsafe_allow_html=True
     )
     st.markdown(
         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"**Wind Speed:** {weather['ws']} m/s"
+        f"Wind Speed: {weather['ws']} m/s"
         f"</div>",
         unsafe_allow_html=True
     )
     st.markdown(
         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"**AQI US:** {pollution['aqius']}"
+        f"AQI US: {pollution['aqius']}"
         f"</div>",
         unsafe_allow_html=True
     )
     st.markdown(
         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"**Main Pollutant:** {pollution['mainus']}"
+        f"Main Pollutant: {pollution['mainus']}"
         f"</div>",
         unsafe_allow_html=True
     )
