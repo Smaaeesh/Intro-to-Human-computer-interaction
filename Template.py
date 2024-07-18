@@ -96,8 +96,8 @@ if category == "By City, State, and Country":
                         else:
                             st.warning("No data available for this location.")
 
-                    else:
-                        st.warning("No stations available, please select another state.")
+                else:
+                    st.warning("No stations available, please select another state.")
             else:
                 st.warning("No stations available, please select another country.")
     else:
