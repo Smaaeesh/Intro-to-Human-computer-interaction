@@ -67,7 +67,7 @@ if category == "By City, State, and Country":
 
                     # : Generate the list of cities, and add a select box for the user to choose the city
                     cities_dict = generate_list_of_cities(state_selected, country_selected)
-                        if city_selected:
+                    if city_selected:
                             aqi_data_url = f"https://api.airvisual.com/v2/city?city={city_selected}&state={state_selected}&country={country_selected}&key={api_key}"
                             aqi_data_dict = requests.get(aqi_data_url).json()
 
