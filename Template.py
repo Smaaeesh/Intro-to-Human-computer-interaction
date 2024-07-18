@@ -178,8 +178,8 @@ elif category == "By Nearest City (IP Address)":
 
 # Handling selection by Latitude and Longitude
 elif category == "By Latitude and Longitude":
-    latitude = st.text_input("Enter latitude:")
-    longitude = st.text_input("Enter longitude:")
+    latitude = st.text_input("Enter latitude: (eg. 40.4406)")
+    longitude = st.text_input("Enter longitude: (eg. -79.9959)")
     if latitude and longitude:
         url = f"https://api.airvisual.com/v2/nearest_city?lat={latitude}&lon={longitude}&key={api_key}"
         response = requests.get(url)
