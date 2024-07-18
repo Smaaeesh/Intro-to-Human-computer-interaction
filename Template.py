@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-import folium
+
 
 api_key = "1df68b90-936c-441d-89a9-997c23f61dfa"
 
