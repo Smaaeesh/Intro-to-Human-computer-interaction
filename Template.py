@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-
+import pydeck as pdk
 
 api_key = "1df68b90-936c-441d-89a9-997c23f61dfa"
 
@@ -88,10 +88,39 @@ def display_weather_and_air_quality(data):
 
     st.write(f"### Map for {location}")
 
-    # Create and display the map using st_folium
-    m = folium.Map(location=[latitude, longitude], zoom_start=10)
-    folium.Marker([latitude, longitude], popup="Location", tooltip="Location").add_to(m)
-    st_folium(m, width=700, height=500)
+    # Create and display the map using pydeck
+    view_state = pdk.ViewState(
+        latitude=latitude,
+        longitude=longitude,
+        zoom=10,
+        pitch=50
+    )
+
+    layer = pdk.Layer(
+        'ScatterplotLayer',
+        data=[{"latitude": latitude, "longitude": longitude}],
+        get_position='[longitude, latitude]',
+        get_color='[26, 255, 0, 160]',
+        get_radius=200,
+        pickable=True,
+    )
+
+    tooltip = {
+        "html": f"Lat: {latitude} <br/> Long: {longitude} <br/>",
+        "style": {
+            "backgroundColor": "steelblue",
+            "color": "white"
+        }
+    }
+
+    r = pdk.Deck(
+        map_style='mapbox://styles/mapbox/satellite-streets-v11',
+        initial_view_state=view_state,
+        layers=[layer],
+        tooltip=tooltip
+    )
+
+    st.pydeck_chart(r)
 
 # Handling selection by City, State, and Country
 if category == "By City, State, and Country":
