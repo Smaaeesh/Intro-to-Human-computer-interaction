@@ -137,11 +137,14 @@ elif category == "By Latitude and Longitude":
             weather = data["current"]["weather"]
             pollution = data["current"]["pollution"]
 
-            st.write(f"### Air Quality and Weather Data for {location}")
-            st.write(f"**Temperature:** {weather['tp']}°C")
-            st.write(f"**Humidity:** {weather['hu']}%")
-            st.write(f"**Wind Speed:** {weather['ws']} m/s")
-            st.write(f"**AQI US:** {pollution['aqius']}")
-            st.write(f"**Main Pollutant:** {pollution['mainus']}")
+           with st.container():
+                st.write("#### Weather")
+                st.write(f"**Temperature:** {weather['tp']}°C")
+                st.write(f"**Humidity:** {weather['hu']}%")
+                st.write(f"**Wind Speed:** {weather['ws']} m/s")
+            with st.container():
+                st.write("#### Air Quality")
+                st.write(f"**AQI US:** {pollution['aqius']}")
+                st.write(f"**Main Pollutant:** {pollution['mainus']}")
         else:
             st.warning("No data available for this location.")
