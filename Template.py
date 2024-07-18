@@ -76,23 +76,23 @@ if category == "By City, State, and Country":
                     cities_list = [i["state"] for i in cities_dict["data"]]
                     cities_list.insert(0, "")
                 city_selected = st.selectbox("Select a city:", options=cities_list)
-                    if city_selected:
-                            aqi_data_url = f"https://api.airvisual.com/v2/city?city={city_selected}&state={state_selected}&country={country_selected}&key={api_key}"
-                            aqi_data_dict = requests.get(aqi_data_url).json()
+                if city_selected:
+                        aqi_data_url = f"https://api.airvisual.com/v2/city?city={city_selected}&state={state_selected}&country={country_selected}&key={api_key}"
+                        aqi_data_dict = requests.get(aqi_data_url).json()
+                    
+                        if aqi_data_dict["status"] == "success":
+                            # : Display the weather and air quality data as shown in the video and description of the assignment
+                            data = aqi_data_dict["data"]
+                            location = data["city"]
+                            weather = data["current"]["weather"]
+                            pollution = data["current"]["pollution"]
 
-                            if aqi_data_dict["status"] == "success":
-                                # : Display the weather and air quality data as shown in the video and description of the assignment
-                                data = aqi_data_dict["data"]
-                                location = data["city"]
-                                weather = data["current"]["weather"]
-                                pollution = data["current"]["pollution"]
-
-                                st.write(f"### Air Quality and Weather Data for {location}")
-                                st.write(f"**Temperature:** {weather['tp']}°C")
-                                st.write(f"**Humidity:** {weather['hu']}%")
-                                st.write(f"**Wind Speed:** {weather['ws']} m/s")
-                                st.write(f"**AQI US:** {pollution['aqius']}")
-                                st.write(f"**Main Pollutant:** {pollution['mainus']}")
+                            st.write(f"### Air Quality and Weather Data for {location}")
+                            st.write(f"**Temperature:** {weather['tp']}°C")
+                            st.write(f"**Humidity:** {weather['hu']}%")
+                            st.write(f"**Wind Speed:** {weather['ws']} m/s")
+                            st.write(f"**AQI US:** {pollution['aqius']}")
+                            st.write(f"**Main Pollutant:** {pollution['mainus']}")
                             else:
                                 st.warning("No data available for this location.")
 
