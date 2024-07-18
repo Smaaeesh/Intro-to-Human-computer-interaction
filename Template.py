@@ -63,7 +63,7 @@ if category == "By City, State, and Country":
         if country_selected:
             # : Generate the list of states, and add a select box for the user to choose the state
             state_selected = st.selectbox("Select a state:", options=states_list)
-                if state_selected:
+            if state_selected:
 
                     # : Generate the list of cities, and add a select box for the user to choose the city
                     cities_dict = generate_list_of_cities(state_selected, country_selected)
