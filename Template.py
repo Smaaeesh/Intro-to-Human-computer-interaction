@@ -1,29 +1,36 @@
 import streamlit as st
 import requests
-
+from streamlit_folium import st_folium
+import folium
 
 api_key = "1df68b90-936c-441d-89a9-997c23f61dfa"
 
+# Configure the page
 st.set_page_config(page_title="Weather and Air Quality Web App", page_icon="☁️")
 
+# Title and header
 st.title("Weather and Air Quality Web App")
 st.header("Streamlit and AirVisual API")
 
+# Function to convert Celsius to Fahrenheit
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
 
+# Cached function to generate the list of countries
 @st.cache_data
 def generate_list_of_countries():
     countries_url = f"https://api.airvisual.com/v2/countries?key={api_key}"
     countries_dict = requests.get(countries_url).json()
     return countries_dict
 
+# Cached function to generate the list of states based on the selected country
 @st.cache_data
 def generate_list_of_states(country_selected):
     states_url = f"https://api.airvisual.com/v2/states?country={country_selected}&key={api_key}"
     states_dict = requests.get(states_url).json()
     return states_dict
 
+# Cached function to generate the list of cities based on the selected state and country
 @st.cache_data
 def generate_list_of_cities(state_selected, country_selected):
     cities_url = f"https://api.airvisual.com/v2/cities?state={state_selected}&country={country_selected}&key={api_key}"
@@ -36,6 +43,7 @@ category = st.sidebar.selectbox(
     ["By City, State, and Country", "By Nearest City (IP Address)", "By Latitude and Longitude"]
 )
 
+# Function to display weather and air quality data, including the map
 def display_weather_and_air_quality(data):
     location = data["city"]
     weather = data["current"]["weather"]
@@ -46,8 +54,8 @@ def display_weather_and_air_quality(data):
     temp_celsius = weather['tp']
     temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
 
+    # Display weather and air quality data in styled boxes
     st.write(f"### Air Quality and Weather Data for {location}")
-
     st.markdown(
         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
         f"**Temperature:** {temp_celsius}°C / {temp_fahrenheit}°F"
@@ -80,12 +88,13 @@ def display_weather_and_air_quality(data):
     )
 
     st.write(f"### Map for {location}")
-    
+
     # Create and display the map using st_folium
     m = folium.Map(location=[latitude, longitude], zoom_start=10)
     folium.Marker([latitude, longitude], popup="Location", tooltip="Location").add_to(m)
     st_folium(m, width=700, height=500)
 
+# Handling selection by City, State, and Country
 if category == "By City, State, and Country":
     countries_dict = generate_list_of_countries()
     if countries_dict["status"] == "success":
@@ -124,6 +133,7 @@ if category == "By City, State, and Country":
     else:
         st.error("Too many requests. Wait for a few minutes before your next API call.")
 
+# Handling selection by Nearest City (IP Address)
 elif category == "By Nearest City (IP Address)":
     url = f"https://api.airvisual.com/v2/nearest_city?key={api_key}"
     aqi_data_dict = requests.get(url).json()
@@ -133,6 +143,7 @@ elif category == "By Nearest City (IP Address)":
     else:
         st.warning("No data available for this location.")
 
+# Handling selection by Latitude and Longitude
 elif category == "By Latitude and Longitude":
     latitude = st.text_input("Enter latitude:")
     longitude = st.text_input("Enter longitude:")
