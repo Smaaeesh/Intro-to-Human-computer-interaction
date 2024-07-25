@@ -1,123 +1,93 @@
 import streamlit as st
 import requests
 import pydeck as pdk
+import pandas as pd
+import matplotlib.pyplot as plt
 
-api_key = "1df68b90-936c-441d-89a9-997c23f61dfa"
+api_key = "sXEjCjQh3vCYZoGbQgEekBX9bmN1EVJRmVilK25JkdVprFEQ6foUwrbW0zTt"
 
 # Configure the page
-st.set_page_config(page_title="Weather and Air Quality Web App", page_icon="☁️")
+st.set_page_config(page_title="Sports Score Tracker", page_icon="🏆")
 
 # Title and header
-st.title("Weather and Air Quality Web App")
-st.header("Streamlit and AirVisual API")
+st.title("Sports Score Tracker")
+st.header("Live Scores, Win Streaks, and More")
 
-# Function to convert Celsius to Fahrenheit
-def celsius_to_fahrenheit(celsius):
-    return (celsius * 9/5) + 32
+# Color picker for background
+bg_color = st.color_picker("Choose Background Color", "#f0f0f0")
+st.markdown(f"""
+    <style>
+    .reportview-container {{
+        background-color: {bg_color};
+    }}
+    </style>
+""", unsafe_allow_html=True)
 
-# Cached function to generate the list of countries
-@st.cache_data
-def generate_list_of_countries():
-    countries_url = f"https://api.airvisual.com/v2/countries?key={api_key}"
-    response = requests.get(countries_url)
-    countries_dict = response.json()
-    return countries_dict
+# Sidebar for team selection
+team_options = ["Team A", "Team B", "Team C"]  # Replace with your teams
+selected_teams = st.multiselect("Select teams to track:", team_options)
 
-# Cached function to generate the list of states based on the selected country
-@st.cache_data
-def generate_list_of_states(country_selected):
-    states_url = f"https://api.airvisual.com/v2/states?country={country_selected}&key={api_key}"
-    response = requests.get(states_url)
-    states_dict = response.json()
-    return states_dict
+# Function to fetch and display real-time scores
+def fetch_scores():
+    # Placeholder for API call to get scores
+    url = f"https://api.sportmonks.com/v3/fixtures?api_token={api_key}"
+    response = requests.get(url)
+    scores = response.json()  # Replace with actual API response handling
+    return scores
 
-# Cached function to generate the list of cities based on the selected state and country
-@st.cache_data
-def generate_list_of_cities(state_selected, country_selected):
-    cities_url = f"https://api.airvisual.com/v2/cities?state={state_selected}&country={country_selected}&key={api_key}"
-    response = requests.get(cities_url)
-    cities_dict = response.json()
-    return cities_dict
+# Display real-time scores
+if selected_teams:
+    scores = fetch_scores()
+    st.write("### Real-Time Scores")
+    for team in selected_teams:
+        st.write(f"Scores for {team}: {scores.get(team, 'No data available')}")
 
-# Sidebar for location selection method
-category = st.sidebar.selectbox(
-    "Select the method to find air quality information:",
-    ["By City, State, and Country", "By Nearest City (IP Address)", "By Latitude and Longitude"]
-)
+# Graph showing team’s win streak status
+def plot_win_streak(team_name):
+    # Placeholder for API call to get win streak data
+    win_streaks = pd.DataFrame({
+        'Date': pd.date_range(start='2024-01-01', periods=10),
+        'Wins': [1, 1, 0, 1, 1, 1, 0, 1, 1, 1]  # Example data
+    })
+    fig, ax = plt.subplots()
+    ax.plot(win_streaks['Date'], win_streaks['Wins'], marker='o')
+    ax.set_title(f"Win Streak for {team_name}")
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Wins')
+    st.pyplot(fig)
 
-# Function to display weather and air quality data, including the map
-def display_weather_and_air_quality(data):
-    location = data["city"]
-    weather = data["current"]["weather"]
-    pollution = data["current"]["pollution"]
-    latitude = data["location"]["coordinates"][1]
-    longitude = data["location"]["coordinates"][0]
+if selected_teams:
+    selected_team_for_streak = st.selectbox("Select a team to view win streak:", selected_teams)
+    plot_win_streak(selected_team_for_streak)
 
-    temp_celsius = weather['tp']
-    temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
-
-    # Display weather and air quality data in styled boxes
-    st.write(f"### Air Quality and Weather Data for {location}")
-    st.markdown(
-        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"Temperature: {temp_celsius}°C / {temp_fahrenheit}°F"
-        f"</div>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"Humidity: {weather['hu']}%"
-        f"</div>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"Wind Speed: {weather['ws']} m/s"
-        f"</div>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"AQI US: {pollution['aqius']}"
-        f"</div>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>"
-        f"Main Pollutant: {pollution['mainus']}"
-        f"</div>",
-        unsafe_allow_html=True
-    )
-
-    st.write(f"### Map for {location}")
-
-    # Create and display the map using pydeck
+# Map to locate local stadium
+def plot_stadium_location(stadium_lat, stadium_lon):
     view_state = pdk.ViewState(
-        latitude=latitude,
-        longitude=longitude,
-        zoom=10,
+        latitude=stadium_lat,
+        longitude=stadium_lon,
+        zoom=12,
         pitch=50
     )
 
     layer = pdk.Layer(
         'ScatterplotLayer',
-        data=[{"latitude": latitude, "longitude": longitude}],
+        data=[{"latitude": stadium_lat, "longitude": stadium_lon}],
         get_position='[longitude, latitude]',
-        get_color='[26, 255, 0, 160]',
+        get_color='[255, 0, 0, 160]',
         get_radius=200,
         pickable=True,
     )
 
     tooltip = {
-        "html": f"Lat: {latitude} <br/> Long: {longitude} <br/>",
+        "html": f"Stadium Location<br/>Lat: {stadium_lat} <br/> Long: {stadium_lon}",
         "style": {
-            "backgroundColor": "steelblue",
+            "backgroundColor": "darkblue",
             "color": "white"
         }
     }
 
     r = pdk.Deck(
-        map_style='mapbox://styles/mapbox/satellite-streets-v11',
+        map_style='mapbox://styles/mapbox/light-v10',
         initial_view_state=view_state,
         layers=[layer],
         tooltip=tooltip
@@ -125,67 +95,16 @@ def display_weather_and_air_quality(data):
 
     st.pydeck_chart(r)
 
-# Handling selection by City, State, and Country
-if category == "By City, State, and Country":
-    countries_dict = generate_list_of_countries()
-    if countries_dict["status"] == "success":
-        countries_list = [i["country"] for i in countries_dict["data"]]
-        countries_list.insert(0, "")
+# Example stadium coordinates (replace with actual coordinates)
+stadium_lat = 40.4406
+stadium_lon = -79.9959
+plot_stadium_location(stadium_lat, stadium_lon)
 
-        country_selected = st.selectbox("Select a country", options=countries_list)
-        if country_selected:
-            states_dict = generate_list_of_states(country_selected)
-            if states_dict["status"] == "success":
-                states_list = [i["state"] for i in states_dict["data"]]
-                states_list.insert(0, "")
-
-                state_selected = st.selectbox("Select a state:", options=states_list)
-                if state_selected:
-                    cities_dict = generate_list_of_cities(state_selected, country_selected)
-                    if cities_dict["status"] == "success":
-                        cities_list = [i["city"] for i in cities_dict["data"]]
-                        cities_list.insert(0, "")
-
-                        city_selected = st.selectbox("Select a city:", options=cities_list)
-                        if city_selected:
-                            aqi_data_url = f"https://api.airvisual.com/v2/city?city={city_selected}&state={state_selected}&country={country_selected}&key={api_key}"
-                            response = requests.get(aqi_data_url)
-                            aqi_data_dict = response.json()
-
-                            if aqi_data_dict["status"] == "success":
-                                display_weather_and_air_quality(aqi_data_dict["data"])
-                            else:
-                                st.warning("No data available for this location.")
-                        else:
-                            st.warning("Please select a city.")
-                    else:
-                        st.warning("No cities available, please select another state.")
-            else:
-                st.warning("No states available, please select another country.")
+# Email updates
+email = st.text_input("Enter your email for regular updates:")
+if st.button("Subscribe"):
+    if email:
+        st.success(f"Subscribed successfully with {email}")
+        # Placeholder for email subscription logic
     else:
-        st.error("Too many requests. Wait for a few minutes before your next API call.")
-
-# Handling selection by Nearest City (IP Address)
-elif category == "By Nearest City (IP Address)":
-    url = f"https://api.airvisual.com/v2/nearest_city?key={api_key}"
-    response = requests.get(url)
-    aqi_data_dict = response.json()
-
-    if aqi_data_dict["status"] == "success":
-        display_weather_and_air_quality(aqi_data_dict["data"])
-    else:
-        st.warning("No data available for this location.")
-
-# Handling selection by Latitude and Longitude
-elif category == "By Latitude and Longitude":
-    latitude = st.text_input("Enter latitude: (eg. 40.4406)")
-    longitude = st.text_input("Enter longitude: (eg. -79.9959)")
-    if latitude and longitude:
-        url = f"https://api.airvisual.com/v2/nearest_city?lat={latitude}&lon={longitude}&key={api_key}"
-        response = requests.get(url)
-        aqi_data_dict = response.json()
-
-        if aqi_data_dict["status"] == "success":
-            display_weather_and_air_quality(aqi_data_dict["data"])
-        else:
-            st.warning("No data available for this location.")
+        st.warning("Please enter a valid email address.")
